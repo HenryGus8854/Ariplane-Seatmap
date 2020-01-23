@@ -1,99 +1,103 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
+import { SEATMAPS } from '../data/data';
 
-const Div = styled.div`
+const Back = styled.div`
   height: 100%;
   width: 100%;
   background-color: #e5e7e9;
   flex-direction: column;
   border-radius: 9px;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
 `;
+
 const SeatDiv = styled.div`
   height: 25px;
   width: 25px;
-  margin: 3px;
+  margin: 2px;
   display: flex;
+`;
+const Img = styled.img`
+  max-height: 25px;
+  max-width: 25px;
+`;
+const SeatOpen = styled.div`
+  flex: 1;
+  background-color: #5dade2;
+  border-radius: 4px;
+`;
+const Nothing = styled.div`
+  flex: 1;
+  background-color: transparent;
+  border-radius: 4px;
 `;
 
 const SeatTaken = styled.div`
   flex: 1;
   background-color: #717d7e;
   border-radius: 4px;
+  opacity: 0.7;
+`;
+const Mapped = styled.div`
+  flex: 1;
+  border-radius: 4px;
 `;
 const TextNum = styled.span`
   font-size: 130%;
-  margin-left: 2px;
+  margin-left: 3px;
 `;
 const Div1 = styled.div`
-  height: 30px;
   background-color: #e5e7e9;
   border-radius: 9px;
   display: flex;
-  flex-direction: row;
-  margin: 2px;
+  flex-direction: column-reverse;
+`;
+const Div2 = styled.div`
+  flex: 1;
+  background-color: #e5e7e9;
+  border-radius: 9px;
+  display: flex;
+  flex-direction: column-reverse;
 `;
 
-const Div2 = styled.div`
-  height: 30px;
-  background-color: #e5e7e9;
+const Li = styled.li`
   display: flex;
-  border-radius: 9px;
-  display: flex;
-  flex-direction: row;
-  margin: 2px;
+  list-style-image: none;
+  list-style-position: outside;
+  list-style-type: none;
+  margin: 1px;
 `;
-const Div3 = styled.div`
-  height: 30px;
-  background-color: #e5e7e9;
-  display: flex;
-  flex-direction: column;
-  border-radius: 9px;
-  display: flex;
-  flex-direction: row;
-  margin: 2px;
-`;
-const Div4 = styled.div`
-  height: 30px;
-  background-color: #e5e7e9;
-  display: flex;
-  flex-direction: column;
-  border-radius: 9px;
-  display: flex;
-  flex-direction: row;
-  margin: 2px;
-`;
-const Div5 = styled.div`
-  height: 30px;
-  background-color: #e5e7e9;
-  border-radius: 9px;
-  display: flex;
-  flex-direction: row;
-  margin: 2px;
-`;
-const Div6 = styled.div`
-  height: 30px;
-  background-color: #e5e7e9;
-  display: flex;
-  flex-direction: column;
-  border-radius: 9px;
-  display: flex;
-  flex-direction: row;
-  margin: 2px;
-`;
-const Div7 = styled.div`
-  height: 30px;
-  background-color: #e5e7e9;
-  display: flex;
-  flex-direction: column;
-  border-radius: 9px;
-  display: flex;
-  flex-direction: row;
-  margin: 2px;
-`;
+function SeatAvailability(info) {
+  const seat = info;
+  switch (seat.availability) {
+    default:
+      return <Nothing />;
+    case 'blocked':
+      return <SeatTaken></SeatTaken>;
+    case 'reserved':
+      return <SeatTaken></SeatTaken>;
+    case 'protected':
+      return <SeatTaken></SeatTaken>;
+    case 'available':
+      return <SeatOpen></SeatOpen>;
+  }
+}
+
+function getData() {
+  const {
+    0: {
+      seatmap: {
+        sections: {
+          1: { rows }
+        }
+      }
+    }
+  } = SEATMAPS;
+  return rows;
+}
 
 class PremEconomy extends Component {
   constructor(props) {
@@ -105,105 +109,62 @@ class PremEconomy extends Component {
   }
 
   render() {
+    const coffee = 'https://img.icons8.com/ios-glyphs/30/000000/coffee.png';
+    const toilet = 'https://img.icons8.com/wired/64/000000/toilet.png';
+    const rows = getData();
+    console.log(rows);
     return (
-      <Div>
+      <Back>
         <Div1>
-          <SeatDiv>
-            <TextNum>F</TextNum>
-          </SeatDiv>
-          <SeatDiv>
-            <SeatTaken />
-          </SeatDiv>
-          <SeatDiv>
-            <SeatTaken />
-          </SeatDiv>
-          <SeatDiv>
-            <SeatTaken />
-          </SeatDiv>
-        </Div1>
-        <Div2>
-          <SeatDiv>
-            <TextNum>E</TextNum>
-          </SeatDiv>
-          <SeatDiv>
-            <SeatTaken />
-          </SeatDiv>
-          <SeatDiv>
-            <SeatTaken />
-          </SeatDiv>
-          <SeatDiv>
-            <SeatTaken />
-          </SeatDiv>
-        </Div2>
-        <Div3>
-          <SeatDiv>
-            <TextNum>D</TextNum>
-          </SeatDiv>
-          <SeatDiv>
-            <SeatTaken />
-          </SeatDiv>
-          <SeatDiv>
-            <SeatTaken />
-          </SeatDiv>
-          <SeatDiv>
-            <SeatTaken />
-          </SeatDiv>
-        </Div3>
-        <Div4>
-          <SeatDiv></SeatDiv>
-          <SeatDiv>
-            <TextNum>10</TextNum>
-          </SeatDiv>
-          <SeatDiv>
-            <TextNum>11</TextNum>
-          </SeatDiv>
-          <SeatDiv>
-            <TextNum>12</TextNum>
-          </SeatDiv>
-        </Div4>
-        <Div5>
-          <SeatDiv>
-            <TextNum>C</TextNum>
-          </SeatDiv>
-          <SeatDiv>
-            <SeatTaken />
-          </SeatDiv>
-          <SeatDiv>
-            <SeatTaken />
-          </SeatDiv>
-          <SeatDiv>
-            <SeatTaken />
-          </SeatDiv>
-        </Div5>
-        <Div6>
-          <SeatDiv>
-            <TextNum>B</TextNum>
-          </SeatDiv>
-          <SeatDiv>
-            <SeatTaken />
-          </SeatDiv>
-          <SeatDiv>
-            <SeatTaken />
-          </SeatDiv>
-          <SeatDiv>
-            <SeatTaken />
-          </SeatDiv>
-        </Div6>
-        <Div7>
           <SeatDiv>
             <TextNum>A</TextNum>
           </SeatDiv>
           <SeatDiv>
-            <SeatTaken />
+            <TextNum>B</TextNum>
           </SeatDiv>
           <SeatDiv>
-            <SeatTaken />
+            <TextNum>C</TextNum>
+          </SeatDiv>
+          <SeatDiv></SeatDiv>
+          <SeatDiv>
+            <TextNum>D</TextNum>
           </SeatDiv>
           <SeatDiv>
-            <SeatTaken />
+            <TextNum>E</TextNum>
           </SeatDiv>
-        </Div7>
-      </Div>
+          <SeatDiv>
+            <TextNum>F</TextNum>
+          </SeatDiv>
+        </Div1>
+        {rows.map((model, index) => (
+          <div key={index}>
+            <Li>
+              <Div2>
+                {model.elements.map((sub, index) => (
+                  <Mapped key={index}>
+                    <SeatDiv>
+                      {(sub.type && sub.type === 'toilet' && (
+                        <Img src={toilet} />
+                      )) ||
+                        (sub.type && sub.type === 'galley' && (
+                          <Img src={coffee} />
+                        )) ||
+                        (sub.type && sub.type === 'aisle' && (
+                          <Nothing>
+                            <TextNum>{model.number}</TextNum>
+                          </Nothing>
+                        )) ||
+                        (sub.type &&
+                          sub.type === 'seat' &&
+                          SeatAvailability(sub))}
+                    </SeatDiv>
+                  </Mapped>
+                ))}
+              </Div2>
+            </Li>
+          </div>
+        ))}
+      </Back>
     );
   }
 }
