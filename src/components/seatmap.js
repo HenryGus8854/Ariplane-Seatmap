@@ -28,6 +28,9 @@ const SeatOpen = styled.div`
   flex: 1;
   background-color: #5dade2;
   border-radius: 4px;
+  &:hover {
+    background-color: #000000;
+  }
 `;
 const Nothing = styled.div`
   flex: 1;
@@ -97,82 +100,28 @@ const SeatPPImg = styled.img`
   height: 17px;
   width: 17px;
 `;
-function getFirst() {
+
+const SeatSelect = styled.div`
+  flex: 1;
+  background-color: #f1c40f;
+  border-radius: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+const SeatSelInner = styled.div`
+  background-color: #ffffff;
+  height: 17px;
+  width: 17px;
+`;
+
+function getSection() {
   const {
     0: {
-      seatmap: {
-        sections: {
-          0: { rows }
-        }
-      }
+      seatmap: { sections }
     }
   } = SEATMAPS;
-  return rows;
-}
-function getPremEcon() {
-  const {
-    0: {
-      seatmap: {
-        sections: {
-          1: { rows }
-        }
-      }
-    }
-  } = SEATMAPS;
-  return rows;
-}
-function getEconomy() {
-  const {
-    0: {
-      seatmap: {
-        sections: {
-          2: { rows }
-        }
-      }
-    }
-  } = SEATMAPS;
-  return rows;
-}
-function SeatAvailability(info) {
-  const seat = info;
-  switch (seat.availability) {
-    default:
-      return <Nothing />;
-    case 'blocked':
-      return (
-        <SeatTaken>
-          <SeatUnaImg
-            src={'https://img.icons8.com/ios-filled/50/000000/x.png'}
-          />
-        </SeatTaken>
-      );
-    case 'reserved':
-      return (
-        <SeatTaken>
-          <SeatUnaImg
-            src={'https://img.icons8.com/ios-filled/50/000000/x.png'}
-          />
-        </SeatTaken>
-      );
-    case 'protected':
-      return (
-        <SeatTaken>
-          <SeatUnaImg
-            src={'https://img.icons8.com/ios-filled/50/000000/x.png'}
-          />
-        </SeatTaken>
-      );
-    case 'available':
-      if (seat.preferred === true) {
-        return (
-          <SeatPremPref>
-            <SeatPPImg src="https://img.icons8.com/ios-filled/50/000000/star.png" />
-          </SeatPremPref>
-        );
-      } else {
-        return <SeatOpen></SeatOpen>;
-      }
-  }
+  return sections;
 }
 
 class SeatMap extends Component {
@@ -180,16 +129,83 @@ class SeatMap extends Component {
     super(props);
 
     this.state = {
-      destination: ''
+      selectable: {}
     };
+    this.SeatAvailability = this.SeatAvailability.bind(this);
+    this.addSeat = this.addSeat.bind(this);
+    this.changeSelect = this.changeSelect.bind(this);
   }
+
+  componentDidMount() {
+    console.log(this.state.selectable);
+  }
+  componentWillUnmount() {}
+  changeSelect = info => {
+    const seat = info;
+    this.setState(prevState => ({
+      selectable: {
+        ...prevState.selectable,
+        [seat]: true
+      }
+    }));
+  };
+
+  addSeat = info => {
+    const seat = info;
+    const newSeat = { [seat]: false };
+    const state = this.state.selectable;
+    Object.assign(state, newSeat);
+  };
+
+  SeatAvailability = info => {
+    const seat = info;
+    switch (seat.availability) {
+      default:
+        return <Nothing />;
+      case 'blocked':
+        return (
+          <SeatTaken>
+            <SeatUnaImg
+              src={'https://img.icons8.com/ios-filled/50/000000/x.png'}
+            />
+          </SeatTaken>
+        );
+      case 'reserved':
+        return (
+          <SeatTaken>
+            <SeatUnaImg
+              src={'https://img.icons8.com/ios-filled/50/000000/x.png'}
+            />
+          </SeatTaken>
+        );
+      case 'protected':
+        return (
+          <SeatTaken>
+            <SeatUnaImg
+              src={'https://img.icons8.com/ios-filled/50/000000/x.png'}
+            />
+          </SeatTaken>
+        );
+      case 'available':
+        this.addSeat(seat.code);
+        if (seat.preferred === true) {
+          return (
+            <SeatPremPref onClick={() => this.changeSelect(seat.code)}>
+              <SeatPPImg src="https://img.icons8.com/ios-filled/50/000000/star.png" />
+            </SeatPremPref>
+          );
+        } else {
+          return (
+            <SeatOpen onClick={() => this.changeSelect(seat.code)}></SeatOpen>
+          );
+        }
+    }
+  };
 
   render() {
     const coffee = 'https://img.icons8.com/ios-glyphs/30/000000/coffee.png';
     const toilet = 'https://img.icons8.com/wired/64/000000/toilet.png';
-    const FirstRows = getFirst();
-    const PremEconRows = getPremEcon();
-    const EconomyRows = getEconomy();
+    const Section = getSection();
 
     return (
       <Back>
@@ -208,13 +224,13 @@ class SeatMap extends Component {
             <TextNum>D</TextNum>
           </SeatDiv>
         </SeatLetters>
-        {FirstRows.map((model, index) => (
+        {Section[0].rows.map((model, index) => (
           <RowContainer key={index}>
-            <Li>
-              <Div2>
-                {model.elements.map((sub, index) => (
-                  <Mapped key={index}>
-                    <SeatDiv>
+            <Li key={index}>
+              <Div2 key={index}>
+                {model.elements.map(sub => (
+                  <Mapped key={sub.code} id={sub.code}>
+                    <SeatDiv key={sub.code}>
                       {(sub.type && sub.type === 'toilet' && (
                         <Img src={toilet} />
                       )) ||
@@ -228,7 +244,7 @@ class SeatMap extends Component {
                         )) ||
                         (sub.type &&
                           sub.type === 'seat' &&
-                          SeatAvailability(sub))}
+                          this.SeatAvailability(sub))}
                     </SeatDiv>
                   </Mapped>
                 ))}
@@ -257,13 +273,13 @@ class SeatMap extends Component {
             <TextNum>F</TextNum>
           </SeatDiv>
         </SeatLetters>
-        {PremEconRows.map((model, index) => (
+        {Section[1].rows.map((model, index) => (
           <RowContainer key={index}>
-            <Li>
-              <Div2>
-                {model.elements.map((sub, index) => (
-                  <Mapped key={index}>
-                    <SeatDiv>
+            <Li key={index}>
+              <Div2 key={index}>
+                {model.elements.map(sub => (
+                  <Mapped key={sub.code} id={sub.code}>
+                    <SeatDiv key={sub.code}>
                       {(sub.type && sub.type === 'toilet' && (
                         <Img src={toilet} />
                       )) ||
@@ -277,7 +293,7 @@ class SeatMap extends Component {
                         )) ||
                         (sub.type &&
                           sub.type === 'seat' &&
-                          SeatAvailability(sub))}
+                          this.SeatAvailability(sub))}
                     </SeatDiv>
                   </Mapped>
                 ))}
@@ -306,13 +322,16 @@ class SeatMap extends Component {
             <TextNum>F</TextNum>
           </SeatDiv>
         </SeatLetters>
-        {EconomyRows.map((model, index) => (
+        {Section[2].rows.map((model, index) => (
           <RowContainer key={index}>
-            <Li>
-              <Div2>
-                {model.elements.map((sub, index) => (
-                  <Mapped key={index}>
-                    <SeatDiv>
+            <Li key={index}>
+              <Div2 key={index}>
+                {model.elements.map(sub => (
+                  <Mapped key={sub.code} id={sub.code}>
+                    <SeatDiv
+                      key={sub.code}
+                      onClick={() => this.changeSelect(sub.code)}
+                    >
                       {(sub.type && sub.type === 'toilet' && (
                         <Img src={toilet} />
                       )) ||
@@ -326,7 +345,7 @@ class SeatMap extends Component {
                         )) ||
                         (sub.type &&
                           sub.type === 'seat' &&
-                          SeatAvailability(sub))}
+                          this.SeatAvailability(sub))}
                     </SeatDiv>
                   </Mapped>
                 ))}

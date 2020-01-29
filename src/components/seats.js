@@ -364,7 +364,7 @@ class SeatList extends Component {
               <NextSegment>Next Segment --></NextSegment>
               <Div6>
                 {flightDetails.map((flight, index) => (
-                  <LegendW>
+                  <LegendW key={index}>
                     <Img src={getCarrierIcon(flight.seatmap.carrier.code)} />
                     <PlaneInfo>
                       <TextNum>{flight.seatmap.carrier.name}</TextNum>
@@ -448,7 +448,7 @@ class SeatList extends Component {
             </Div4>
             <Div5>
               {flightDetails.map((flight, index) => (
-                <Div5W>
+                <Div5W key={index}>
                   <Div5Right>
                     <img
                       src={getCarrierIcon(flight.seatmap.carrier.code)}
