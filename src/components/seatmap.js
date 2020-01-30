@@ -26,10 +26,11 @@ const Img = styled.img`
 `;
 const SeatOpen = styled.div`
   flex: 1;
-  background-color: #5dade2;
+  background-color: ${props => (props.selected ? '#ffffff' : '#5DADE2')};
+  border: ${props => (props.selected ? '4px solid gold' : 'none')};
   border-radius: 4px;
   &:hover {
-    background-color: #000000;
+    background-color: #6cbbf7;
   }
 `;
 const Nothing = styled.div`
@@ -90,11 +91,15 @@ const SeatUnaImg = styled.img`
 `;
 const SeatPremPref = styled.div`
   flex: 1;
-  background-color: #58d68d;
+  background-color: ${props => (props.selected ? '#ffffff' : '#58d68d')};
+  border: ${props => (props.selected ? '4px solid gold' : 'none')};
   border-radius: 4px;
   display: flex;
   justify-content: center;
   align-items: center;
+  &:hover {
+    background-color: #5eba7d;
+  }
 `;
 const SeatPPImg = styled.img`
   height: 17px;
@@ -103,8 +108,9 @@ const SeatPPImg = styled.img`
 
 const SeatSelect = styled.div`
   flex: 1;
-  background-color: #f1c40f;
+  background-color: #ffffff;
   border-radius: 4px;
+  border: 5px solid gold;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -137,24 +143,58 @@ class SeatMap extends Component {
   }
 
   componentDidMount() {
-    console.log(this.state.selectable);
+    this.addSeat();
   }
   componentWillUnmount() {}
   changeSelect = info => {
     const seat = info;
-    this.setState(prevState => ({
-      selectable: {
-        ...prevState.selectable,
-        [seat]: true
-      }
-    }));
+    if (this.state.selectable[seat] === false) {
+      this.setState(prevState => ({
+        selectable: {
+          ...prevState.selectable,
+          [seat]: true
+        }
+      }));
+    } else {
+      this.setState(prevState => ({
+        selectable: {
+          ...prevState.selectable,
+          [seat]: false
+        }
+      }));
+    }
   };
 
-  addSeat = info => {
-    const seat = info;
-    const newSeat = { [seat]: false };
-    const state = this.state.selectable;
-    Object.assign(state, newSeat);
+  addSeat = () => {
+    let seatState = {};
+    const sections = getSection();
+    let i;
+    for (i = 0; i < sections.length; ) {
+      const row = sections[i].rows;
+      i++;
+      let j;
+      for (j = 0; j < row.length; ) {
+        const element = row[j].elements;
+        let k;
+        for (k = 0; k < element.length; ) {
+          const seat = element[k];
+          if (seat.type === 'seat' && seat.availability === 'available') {
+            const newseat = { [seat.code]: false };
+            seatState = { ...seatState, ...newseat };
+            k++;
+          } else {
+            k++;
+          }
+        }
+        j++;
+      }
+    }
+    this.setState({
+      selectable: {
+        ...seatState
+      }
+    });
+    console.log(seatState);
   };
 
   SeatAvailability = info => {
@@ -187,16 +227,21 @@ class SeatMap extends Component {
           </SeatTaken>
         );
       case 'available':
-        this.addSeat(seat.code);
         if (seat.preferred === true) {
           return (
-            <SeatPremPref onClick={() => this.changeSelect(seat.code)}>
+            <SeatPremPref
+              onClick={() => this.changeSelect(seat.code)}
+              selected={this.state.selectable[seat.code] ? true : false}
+            >
               <SeatPPImg src="https://img.icons8.com/ios-filled/50/000000/star.png" />
             </SeatPremPref>
           );
         } else {
           return (
-            <SeatOpen onClick={() => this.changeSelect(seat.code)}></SeatOpen>
+            <SeatOpen
+              onClick={() => this.changeSelect(seat.code)}
+              selected={this.state.selectable[seat.code] ? true : false}
+            ></SeatOpen>
           );
         }
     }
