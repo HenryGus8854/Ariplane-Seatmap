@@ -1,13 +1,27 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import SeatMap from './seatmap';
-import { SEGMENTS, SEATMAPS } from '../data/data';
 import moment from 'moment';
+import axios from 'axios';
 
 function getCarrierIcon(code) {
   return `https://wf-deploy-assets.whereto.com/airlines/${code}.png`;
 }
-
+const Wrapper = styled.div`
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+`;
+const Wrapper2 = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+`;
+const Loading = styled.div`
+  display: flex;
+`;
 const Div = styled.div`
   width: 1100px;
   height: 900px;
@@ -35,15 +49,20 @@ const SegmentsW = styled.div`
   flex: 1;
   display: flex;
   flex-direction: row;
+  align-items: flex-end;
 `;
 const Segment = styled.div`
-  height: 100%;
+  height: ${props => (props.selected ? '96px' : '72px')};
+  bottom: 0%;
   width: 260px;
   margin-top: 3px;
   margin-left: 3px;
   margin-right: 3px;
-  background-color: #3498db;
+  background-color: ${props => (props.selected ? '#3498db' : '#1775E1')};
   color: white;
+  &:hover {
+    background-color: #3498db;
+  }
 `;
 const SegmentW = styled.div`
   display: flex;
@@ -81,7 +100,7 @@ const NextSegment = styled.button`
   font-size: 16px;
   position: absolute;
   opacity: 0.7;
-  top: 22%;
+  top: 16%;
   left: 80%;
   &:hover {
     opacity: 1;
@@ -187,61 +206,29 @@ const FirstClassW = styled.div`
   align-items: center;
   justify-content: center;
 `;
-
 const BracketW = styled.div`
   flex: 1;
-
   display: flex;
   flex-direction: row;
 `;
-const BracketFirst = styled.div`
-  align-items: center;
-  justify-content: center;
-  display: flex;
-  flex-direction: column;
+const BtextW = styled.div`
+  width: 37px;
 `;
-const BracketPrem = styled.div`
-  align-items: center;
-  justify-content: center;
+const BtextWcenter = styled.div`
   display: flex;
-  flex-direction: column;
-`;
-const BracketEcomony = styled.div`
-  align-items: center;
   justify-content: center;
-  display: flex;
-  flex-direction: column;
+  align-items: center;
 `;
 const BracketText = styled.span`
   font-size: 100%;
-  margin-left: 10px;
 `;
 const BracketF = styled.div`
   height: 40px;
-  width: 225px;
   border-left: 2px solid grey;
   border-top: 2px solid grey;
   border-right: 2px solid grey;
   border-radius: 9px;
   margin-left: 30px;
-`;
-const BracketP = styled.div`
-  height: 40px;
-  width: 115px;
-  border-left: 2px solid grey;
-  border-top: 2px solid grey;
-  border-right: 2px solid grey;
-  border-radius: 9px;
-  margin-left: 20px;
-`;
-const BracketE = styled.div`
-  height: 40px;
-  width: 630px;
-  border-left: 2px solid grey;
-  border-top: 2px solid grey;
-  border-right: 2px solid grey;
-  border-radius: 9px;
-  margin-left: 20px;
 `;
 const Img = styled.img`
   max-height: 50px;
@@ -307,173 +294,219 @@ const IconImg = styled.img`
   width: 30px;
   margin: 10px;
 `;
-function getSegment() {
-  const flights = SEGMENTS;
-  return flights;
-}
-function getSeatmap() {
-  const details = SEATMAPS;
-  return details;
-}
 
 class SeatList extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      destination: ''
+      seatMaps: [],
+      segment: [],
+      seatMapNum: 0,
+      loaded: false
     };
+    this.getData = this.getData.bind(this);
+    this.changeFlight = this.changeFlight.bind(this);
+    this.segmentChange = this.segmentChange.bind(this);
+  }
+  componentDidMount() {
+    this.getData();
   }
 
+  componentWillUnmount() {}
+
+  changeFlight = () => {
+    const length = this.state.segment.length - 1;
+    if (this.state.seatMapNum < length) {
+      this.setState(prevState => ({
+        seatMapNum: prevState.seatMapNum + 1
+      }));
+    } else {
+      this.setState({
+        seatMapNum: 0
+      });
+    }
+  };
+  segmentChange = segnum => {
+    const num = segnum;
+    this.setState({
+      seatMapNum: num
+    });
+  };
+
+  getData = async () => {
+    const res = await axios.get(
+      'https://gist.githubusercontent.com/manfredxu99/c7de8bb829712e2e3f8b69995a7853e9/raw/434d8d1e981d171f86c0a1eac5f7f447309bde8c/data.json'
+    );
+    console.log(res);
+    this.setState({
+      seatMaps: res.data.seatmaps,
+      segment: res.data.segments,
+      loaded: true
+    });
+  };
+
   render() {
-    const flightInfo = getSegment();
-    const flightDetails = getSeatmap();
+    const flightInfo = this.state.segment;
+    const flightDetails = this.state.seatMaps[this.state.seatMapNum];
     console.log(flightInfo);
     console.log(flightDetails);
     return (
-      <Div>
-        <Div1>
-          <h1>Please choose your seats for your flights:</h1>
-        </Div1>
-        <Div2>
-          <SegmentsW>
-            {flightInfo.map((flights, index) => (
-              <Segment key={index}>
-                <SegmentW>
-                  <TextNum>
-                    {flights.departure.airport}
-                    <img
-                      src="https://img.icons8.com/ios/24/000000/long-arrow-right.png"
-                      style={{ height: '15px', width: '20px' }}
-                      alt="==>"
-                    />
-                    {flights.arrival.airport}
-                  </TextNum>
-                  <TextNum>
-                    {moment(flights.departure.datetime).format(
-                      'MMMM Do YYYY, h:mm a'
-                    )}
-                  </TextNum>
-                  <TextNum>Flight No: {flights.flightNumber}</TextNum>
-                </SegmentW>
-              </Segment>
-            ))}
-          </SegmentsW>
-          <Div3>
-            <Div4>
-              <NextSegment>Next Segment --></NextSegment>
-              <Div6>
-                {flightDetails.map((flight, index) => (
-                  <LegendW key={index}>
-                    <Img src={getCarrierIcon(flight.seatmap.carrier.code)} />
-                    <PlaneInfo>
-                      <TextNum>{flight.seatmap.carrier.name}</TextNum>
-                      <TextNum>{flight.seatmap.aircraftType}</TextNum>
-                    </PlaneInfo>
-                    <Legend>
-                      <SeatDiv>
-                        <SeatOpen></SeatOpen>
-                      </SeatDiv>
-                      <span>Available</span>
-                    </Legend>
-                    <Legend>
-                      <SeatDiv>
-                        <SeatPreferred></SeatPreferred>
-                      </SeatDiv>
-                      <span>Preferred</span>
-                    </Legend>
-                    <Legend>
-                      <SeatDiv>
-                        <SeatPremPref>
-                          <SeatPPImg src="https://img.icons8.com/ios-filled/50/000000/star.png" />
-                        </SeatPremPref>
-                      </SeatDiv>
-                      <span>Premium Preferred</span>
-                    </Legend>
-                    <Legend>
-                      <SeatDiv>
-                        <SeatTaken>
-                          <SeatUnaImg src="https://img.icons8.com/ios-filled/50/000000/x.png" />
-                        </SeatTaken>
-                      </SeatDiv>
-                      <span>Unavailable</span>
-                    </Legend>
-                    <Legend>
-                      <SeatDiv>
-                        <SeatSelect>
-                          <SeatSelInner />
-                        </SeatSelect>
-                      </SeatDiv>
-                      <span>Selected</span>
-                    </Legend>
-                    <Legend>
-                      <SeatDiv>
+      <Wrapper>
+        {this.state.loaded ? (
+          <Div>
+            <Div1>
+              <h1>Please choose your seats for your flights:</h1>
+            </Div1>
+            <Div2>
+              <SegmentsW>
+                {flightInfo.map((flights, index) => (
+                  <Segment
+                    key={index}
+                    selected={index === this.state.seatMapNum}
+                    onClick={() => this.segmentChange(index)}
+                  >
+                    <SegmentW>
+                      <TextNum>
+                        {flights.departure.airport}
                         <img
-                          src="https://img.icons8.com/wired/64/000000/toilet.png"
-                          style={{ height: '25px', width: '25px' }}
-                          alt="Toilet"
+                          src="https://img.icons8.com/ios/24/000000/long-arrow-right.png"
+                          style={{ height: '15px', width: '20px' }}
+                          alt="==>"
                         />
-                      </SeatDiv>
-                      <span>Lavatory</span>
-                    </Legend>
-                  </LegendW>
+                        {flights.arrival.airport}
+                      </TextNum>
+                      <TextNum>
+                        {moment(flights.departure.datetime).format(
+                          'MMMM Do YYYY, h:mm a'
+                        )}
+                      </TextNum>
+                      <TextNum>Flight No: {flights.flightNumber}</TextNum>
+                    </SegmentW>
+                  </Segment>
                 ))}
-                <LegendWBot>
-                  <span style={{ color: 'blue', fontSize: '115%' }}>
-                    Please choose a seat for this segment.
-                  </span>
-                </LegendWBot>
-              </Div6>
-              <Div7>
-                <BracketW>
-                  <BracketFirst>
-                    <BracketText>First</BracketText>
-                    <BracketF />
-                  </BracketFirst>
-                  <BracketPrem>
-                    <BracketText>Premium Economy</BracketText>
-                    <BracketP />
-                  </BracketPrem>
-                  <BracketEcomony>
-                    <BracketText>Economy</BracketText>
-                    <BracketE />
-                  </BracketEcomony>
-                </BracketW>
-                <Div8>
-                  <FirstClassW>
-                    <SeatMap />
-                  </FirstClassW>
-                </Div8>
-              </Div7>
-            </Div4>
-            <Div5>
-              {flightDetails.map((flight, index) => (
-                <Div5W key={index}>
-                  <Div5Right>
-                    <img
-                      src={getCarrierIcon(flight.seatmap.carrier.code)}
-                      style={{ width: '35%' }}
-                      alt="Carrier"
-                    />
-                  </Div5Right>
-                  <Div5Center>
-                    <IconImg src="https://img.icons8.com/ultraviolet/40/000000/high-connection.png" />
-                    <TextNum>
-                      {flight.seatmap.details.inFlightServices[0].name}
-                    </TextNum>
-                  </Div5Center>
-                  <Div5Left>
-                    <IconImg src="https://img.icons8.com/ultraviolet/40/000000/no-smoking.png" />
-                    <TextNum>
-                      {flight.seatmap.details.inFlightServices[1].name}
-                    </TextNum>
-                  </Div5Left>
-                </Div5W>
-              ))}
-            </Div5>
-          </Div3>
-        </Div2>
-      </Div>
+              </SegmentsW>
+              <Div3>
+                <Div4>
+                  <NextSegment onClick={this.changeFlight}>
+                    Next Segment -->
+                  </NextSegment>
+                  <Div6>
+                    <LegendW>
+                      <Img
+                        src={getCarrierIcon(flightDetails.seatmap.carrier.code)}
+                      />
+                      <PlaneInfo>
+                        <TextNum>{flightDetails.seatmap.carrier.name}</TextNum>
+                        <TextNum>{flightDetails.seatmap.aircraftType}</TextNum>
+                      </PlaneInfo>
+                      <Legend>
+                        <SeatDiv>
+                          <SeatOpen></SeatOpen>
+                        </SeatDiv>
+                        <span>Available</span>
+                      </Legend>
+                      <Legend>
+                        <SeatDiv>
+                          <SeatPreferred></SeatPreferred>
+                        </SeatDiv>
+                        <span>Preferred</span>
+                      </Legend>
+                      <Legend>
+                        <SeatDiv>
+                          <SeatPremPref>
+                            <SeatPPImg src="https://img.icons8.com/ios-filled/50/000000/star.png" />
+                          </SeatPremPref>
+                        </SeatDiv>
+                        <span>Premium Preferred</span>
+                      </Legend>
+                      <Legend>
+                        <SeatDiv>
+                          <SeatTaken>
+                            <SeatUnaImg src="https://img.icons8.com/ios-filled/50/000000/x.png" />
+                          </SeatTaken>
+                        </SeatDiv>
+                        <span>Unavailable</span>
+                      </Legend>
+                      <Legend>
+                        <SeatDiv>
+                          <SeatSelect>
+                            <SeatSelInner />
+                          </SeatSelect>
+                        </SeatDiv>
+                        <span>Selected</span>
+                      </Legend>
+                      <Legend>
+                        <SeatDiv>
+                          <img
+                            src="https://img.icons8.com/wired/64/000000/toilet.png"
+                            style={{ height: '25px', width: '25px' }}
+                            alt="Toilet"
+                          />
+                        </SeatDiv>
+                        <span>Lavatory</span>
+                      </Legend>
+                    </LegendW>
+                    <LegendWBot>
+                      <span style={{ color: 'blue', fontSize: '115%' }}>
+                        Please choose a seat for this segment.
+                      </span>
+                    </LegendWBot>
+                  </Div6>
+                  <Div7>
+                    <BracketW>
+                      {flightDetails.seatmap.sections.map(sections => (
+                        <Wrapper2>
+                          <BtextW>
+                            <BtextWcenter>
+                              <BracketText>{sections.label}</BracketText>
+                            </BtextWcenter>
+                          </BtextW>
+                          <BracketF
+                            style={{ width: sections.rows.length * 37 }}
+                          />
+                        </Wrapper2>
+                      ))}
+                    </BracketW>
+                    <Div8>
+                      <FirstClassW>
+                        <SeatMap state={flightDetails} />
+                      </FirstClassW>
+                    </Div8>
+                  </Div7>
+                </Div4>
+                <Div5>
+                  <Div5W>
+                    <Div5Right>
+                      <img
+                        src={getCarrierIcon(flightDetails.seatmap.carrier.code)}
+                        style={{ width: '35%' }}
+                        alt="Carrier"
+                      />
+                    </Div5Right>
+                    <Div5Center>
+                      <IconImg src="https://img.icons8.com/ultraviolet/40/000000/high-connection.png" />
+                      <TextNum>
+                        {flightDetails.seatmap.details.inFlightServices[0].name}
+                      </TextNum>
+                    </Div5Center>
+                    <Div5Left>
+                      <IconImg src="https://img.icons8.com/ultraviolet/40/000000/no-smoking.png" />
+                      <TextNum>
+                        {flightDetails.seatmap.details.inFlightServices[1].name}
+                      </TextNum>
+                    </Div5Left>
+                  </Div5W>
+                </Div5>
+              </Div3>
+            </Div2>
+          </Div>
+        ) : (
+          <Wrapper>
+            <Loading />
+          </Wrapper>
+        )}
+      </Wrapper>
     );
   }
 }
