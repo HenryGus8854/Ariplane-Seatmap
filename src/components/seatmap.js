@@ -15,11 +15,8 @@ const Back = styled.div`
   border-radius: 9px;
   display: flex;
   flex-direction: row;
-  align-items: center;
-  justify-content: center;
 `;
 const SectionW = styled.div`
-  flex: 1;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -151,7 +148,7 @@ class SeatMap extends Component {
       <Back>
         {Section.map(sects => (
           <SectionW key={sects.label}>
-            <SeatLetters key={sects.label}>
+            <SeatLetters>
               {getColumns(sects).map((col, index) => (
                 <SeatDiv key={index}>
                   <CenterW>
@@ -166,7 +163,7 @@ class SeatMap extends Component {
             </SeatLetters>
             {sects.rows.map((model, index) => (
               <RowContainer key={index}>
-                <Li key={index}>
+                <Li>
                   <Div2>
                     {model.elements.map(sub => (
                       <Mapped key={sub.code}>
