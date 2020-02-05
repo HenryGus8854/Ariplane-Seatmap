@@ -349,6 +349,10 @@ class SeatList extends Component {
   render() {
     const flightInfo = this.state.segment;
     const flightDetails = this.state.seatMaps[this.state.seatMapNum];
+    const noSmoking =
+      'https://img.icons8.com/ultraviolet/40/000000/no-smoking.png';
+    const wifi =
+      'https://img.icons8.com/ultraviolet/40/000000/high-connection.png';
     console.log(flightInfo);
     console.log(flightDetails);
     return (
@@ -484,18 +488,20 @@ class SeatList extends Component {
                         alt="Carrier"
                       />
                     </Div5Right>
-                    <Div5Center>
-                      <IconImg src="https://img.icons8.com/ultraviolet/40/000000/high-connection.png" />
-                      <TextNum>
-                        {flightDetails.seatmap.details.inFlightServices[0].name}
-                      </TextNum>
-                    </Div5Center>
-                    <Div5Left>
-                      <IconImg src="https://img.icons8.com/ultraviolet/40/000000/no-smoking.png" />
-                      <TextNum>
-                        {flightDetails.seatmap.details.inFlightServices[1].name}
-                      </TextNum>
-                    </Div5Left>
+                    {flightDetails.seatmap.details.inFlightServices.map(
+                      (services, index) => (
+                        <Div5Center key={index}>
+                          {(services.name && services.name === 'Wi-Fi' && (
+                            <IconImg src={wifi} />
+                          )) ||
+                            (services.name &&
+                              services.name === 'Non-Smoking' && (
+                                <IconImg src={noSmoking} />
+                              ))}
+                          <TextNum>{services.name}</TextNum>
+                        </Div5Center>
+                      )
+                    )}
                   </Div5W>
                 </Div5>
               </Div3>

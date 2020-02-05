@@ -54,11 +54,11 @@ class SeatAvailability extends Component {
   isRegOrPrem = info => {
     const seat = info;
     if (seat.availability === 'available') {
-      if (seat.preferred === undefined) {
+      if (!seat.preferred) {
         return (
           <SeatOpen
             onClick={() => this.props.change(seat.code)}
-            selected={this.props.state[seat.code] ? true : false}
+            selected={this.props.available[seat.code]}
           ></SeatOpen>
         );
       }
@@ -66,7 +66,7 @@ class SeatAvailability extends Component {
         return (
           <SeatPremPref
             onClick={() => this.props.change(seat.code)}
-            selected={this.props.state[seat.code] ? true : false}
+            selected={this.props.available[seat.code]}
           >
             <SeatPPImg src="https://img.icons8.com/ios-filled/50/000000/star.png" />
           </SeatPremPref>

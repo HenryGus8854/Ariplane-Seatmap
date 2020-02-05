@@ -167,10 +167,10 @@ class SeatMap extends Component {
             {sects.rows.map((model, index) => (
               <RowContainer key={index}>
                 <Li key={index}>
-                  <Div2 key={index}>
+                  <Div2>
                     {model.elements.map(sub => (
                       <Mapped key={sub.code}>
-                        <SeatDiv key={sub.code}>
+                        <SeatDiv>
                           {(sub.type && sub.type === 'toilet' && (
                             <Img src={toilet} />
                           )) ||
@@ -184,7 +184,7 @@ class SeatMap extends Component {
                             )) ||
                             (sub.type && sub.type === 'seat' && (
                               <SeatAvailability
-                                state={this.state.selectable}
+                                available={this.state.selectable}
                                 change={this.changeSelect}
                                 code={sub}
                               />
