@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import styled from 'styled-components';
 import SeatMap from './seatmap';
 import moment from 'moment';
-import axios from 'axios';
+import { connect } from 'react-redux';
+import * as actionCreator from '../store/actions/index';
 
 function getCarrierIcon(code) {
   return `https://wf-deploy-assets.whereto.com/airlines/${code}.png`;
@@ -294,70 +295,53 @@ const IconImg = styled.img`
   width: 30px;
   margin: 10px;
 `;
-
+const mapStateToProps = state => {
+  return {
+    selected: state.selected,
+    seatMapNum: state.seatMapNum,
+    flightInfo: state.flightInfo,
+    loaded: state.loaded
+  };
+};
+const mapDispachToProps = dispatch => {
+  return {
+    getFlightInfo: () => dispatch(actionCreator.getFlightInfo()),
+    selectSeat: pram => dispatch(actionCreator.selectSeat(pram)),
+    changeFlight: pram => dispatch(actionCreator.changeFlight(pram))
+  };
+};
 class SeatList extends Component {
   constructor(props) {
     super(props);
-
-    this.state = {
-      seatMaps: [],
-      segment: [],
-      seatMapNum: 0,
-      loaded: false
-    };
-    this.getData = this.getData.bind(this);
-    this.changeFlight = this.changeFlight.bind(this);
-    this.segmentChange = this.segmentChange.bind(this);
+    this.nextFlight = this.nextFlight.bind(this);
   }
   componentDidMount() {
-    this.getData();
+    this.props.getFlightInfo();
   }
 
   componentWillUnmount() {}
 
-  changeFlight = () => {
-    const length = this.state.segment.length - 1;
-    if (this.state.seatMapNum < length) {
-      this.setState(prevState => ({
-        seatMapNum: prevState.seatMapNum + 1
-      }));
+  nextFlight = () => {
+    const length = this.props.flightInfo.segments.length - 1;
+    if (this.props.seatMapNum < length) {
+      const num = this.props.seatMapNum + 1;
+      this.props.changeFlight(num);
     } else {
-      this.setState({
-        seatMapNum: 0
-      });
+      this.props.changeFlight(0);
     }
-  };
-  segmentChange = segnum => {
-    const num = segnum;
-    this.setState({
-      seatMapNum: num
-    });
-  };
-
-  getData = async () => {
-    const res = await axios.get(
-      'https://gist.githubusercontent.com/manfredxu99/c7de8bb829712e2e3f8b69995a7853e9/raw/434d8d1e981d171f86c0a1eac5f7f447309bde8c/data.json'
-    );
-    console.log(res);
-    this.setState({
-      seatMaps: res.data.seatmaps,
-      segment: res.data.segments,
-      loaded: true
-    });
   };
 
   render() {
-    const flightInfo = this.state.segment;
-    const flightDetails = this.state.seatMaps[this.state.seatMapNum];
+    const flightInfo = this.props.flightInfo.segments;
+    const flightDetails = this.props.flightInfo.seatmaps;
     const noSmoking =
       'https://img.icons8.com/ultraviolet/40/000000/no-smoking.png';
     const wifi =
       'https://img.icons8.com/ultraviolet/40/000000/high-connection.png';
-    console.log(flightInfo);
-    console.log(flightDetails);
+
     return (
       <Wrapper>
-        {this.state.loaded ? (
+        {this.props.loaded ? (
           <Div>
             <Div1>
               <h1>Please choose your seats for your flights:</h1>
@@ -367,8 +351,8 @@ class SeatList extends Component {
                 {flightInfo.map((flights, index) => (
                   <Segment
                     key={index}
-                    selected={index === this.state.seatMapNum}
-                    onClick={() => this.segmentChange(index)}
+                    selected={index === this.props.seatMapNum}
+                    onClick={() => this.props.changeFlight(index)}
                   >
                     <SegmentW>
                       <TextNum>
@@ -392,17 +376,30 @@ class SeatList extends Component {
               </SegmentsW>
               <Div3>
                 <Div4>
-                  <NextSegment onClick={this.changeFlight}>
+                  <NextSegment onClick={this.nextFlight}>
                     Next Segment -->
                   </NextSegment>
                   <Div6>
                     <LegendW>
                       <Img
-                        src={getCarrierIcon(flightDetails.seatmap.carrier.code)}
+                        src={getCarrierIcon(
+                          flightDetails[this.props.seatMapNum].seatmap.carrier
+                            .code
+                        )}
                       />
                       <PlaneInfo>
-                        <TextNum>{flightDetails.seatmap.carrier.name}</TextNum>
-                        <TextNum>{flightDetails.seatmap.aircraftType}</TextNum>
+                        <TextNum>
+                          {
+                            flightDetails[this.props.seatMapNum].seatmap.carrier
+                              .name
+                          }
+                        </TextNum>
+                        <TextNum>
+                          {
+                            flightDetails[this.props.seatMapNum].seatmap
+                              .aircraftType
+                          }
+                        </TextNum>
                       </PlaneInfo>
                       <Legend>
                         <SeatDiv>
@@ -459,7 +456,9 @@ class SeatList extends Component {
                   </Div6>
                   <Div7>
                     <BracketW>
-                      {flightDetails.seatmap.sections.map(sections => (
+                      {flightDetails[
+                        this.props.seatMapNum
+                      ].seatmap.sections.map(sections => (
                         <Wrapper2>
                           <BtextW>
                             <BtextWcenter>
@@ -474,7 +473,7 @@ class SeatList extends Component {
                     </BracketW>
                     <Div8>
                       <FirstClassW>
-                        <SeatMap state={flightDetails} />
+                        <SeatMap />
                       </FirstClassW>
                     </Div8>
                   </Div7>
@@ -483,12 +482,17 @@ class SeatList extends Component {
                   <Div5W>
                     <Div5Right>
                       <img
-                        src={getCarrierIcon(flightDetails.seatmap.carrier.code)}
+                        src={getCarrierIcon(
+                          flightDetails[this.props.seatMapNum].seatmap.carrier
+                            .code
+                        )}
                         style={{ width: '35%' }}
                         alt="Carrier"
                       />
                     </Div5Right>
-                    {flightDetails.seatmap.details.inFlightServices.map(
+                    {flightDetails[
+                      this.props.seatMapNum
+                    ].seatmap.details.inFlightServices.map(
                       (services, index) => (
                         <Div5Center key={index}>
                           {(services.name && services.name === 'Wi-Fi' && (
@@ -517,4 +521,4 @@ class SeatList extends Component {
   }
 }
 
-export default SeatList;
+export default connect(mapStateToProps, mapDispachToProps)(SeatList);
