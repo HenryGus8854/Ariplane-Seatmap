@@ -36,10 +36,6 @@ const SeatDiv = styled.div`
   margin: 2px;
   display: flex;
 `;
-const Img = styled.img`
-  max-height: 25px;
-  max-width: 25px;
-`;
 
 const Nothing = styled.div`
   flex: 1;
@@ -50,10 +46,6 @@ const Nothing = styled.div`
   justify-content: center;
 `;
 
-const Mapped = styled.div`
-  flex: 1;
-  border-radius: 4px;
-`;
 const TextNum = styled.span`
   font-size: 130%;
 `;
@@ -63,25 +55,6 @@ const SeatLetters = styled.div`
   border-radius: 9px;
   display: flex;
   flex-direction: column-reverse;
-`;
-
-const RowContainer = styled.div`
-  margin-left: 3px;
-  margin-right: 3px;
-`;
-const Div2 = styled.div`
-  flex: 1;
-  background-color: #e5e7e9;
-  border-radius: 9px;
-  display: flex;
-  flex-direction: column-reverse;
-`;
-const Li = styled.li`
-  display: flex;
-  list-style-image: none;
-  list-style-position: outside;
-  list-style-type: none;
-  margin: 1px;
 `;
 const Wrapper = styled.div`
   display: flex;
@@ -102,7 +75,7 @@ const mapStateToProps = state => {
 };
 const mapDispachToProps = dispatch => {
   return {
-    getFlightInfo: () => dispatch(actionCreator.getFlightInfo()),
+    getFlightInfo: () => dispatch(actionCreator.requestFlightInfo()),
     selectSeat: pram => dispatch(actionCreator.selectSeat(pram)),
     changeFlight: pram => dispatch(actionCreator.changeFlight(pram))
   };

@@ -139,12 +139,7 @@ const Div5Center = styled.div`
   flex-direction: row;
   align-items: center;
 `;
-const Div5Left = styled.div`
-  flex: 5;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-`;
+
 const Div6 = styled.div`
   flex: 1;
   background-color: #e5e7e9;
@@ -305,7 +300,7 @@ const mapStateToProps = state => {
 };
 const mapDispachToProps = dispatch => {
   return {
-    getFlightInfo: () => dispatch(actionCreator.getFlightInfo()),
+    getFlightInfo: () => dispatch(actionCreator.requestFlightInfo()),
     selectSeat: pram => dispatch(actionCreator.selectSeat(pram)),
     changeFlight: pram => dispatch(actionCreator.changeFlight(pram))
   };
@@ -338,7 +333,7 @@ class SeatList extends Component {
       'https://img.icons8.com/ultraviolet/40/000000/no-smoking.png';
     const wifi =
       'https://img.icons8.com/ultraviolet/40/000000/high-connection.png';
-
+    console.log(this.props.flightInfo);
     return (
       <Wrapper>
         {this.props.loaded ? (

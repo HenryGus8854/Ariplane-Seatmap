@@ -56,7 +56,7 @@ const mapStateToProps = state => {
 };
 const mapDispachToProps = dispatch => {
   return {
-    getFlightInfo: () => dispatch(actionCreator.getFlightInfo()),
+    getFlightInfo: () => dispatch(actionCreator.requestFlightInfo()),
     selectSeat: pram => dispatch(actionCreator.selectSeat(pram)),
     changeFlight: pram => dispatch(actionCreator.changeFlight(pram))
   };
